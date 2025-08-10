@@ -469,6 +469,19 @@ export class AppSidebarLeft extends SidebarSlider {
         peerId: appImManager.myId
       });
     });
+
+    addShortcutListener(['ctrl+l', 'meta+l'], () => {
+      if(appNavigationController.findItemByType('popup')) return;
+      // Open message logs
+      const appSidebarRight = MOUNT_CLASS_TO.appSidebarRight;
+      appSidebarRight.toggleSidebar(true);
+      setTimeout(() => {
+        const messageLogsBtn = appSidebarRight.sidebarEl.querySelector('.tab-nav-btn:last-child') as HTMLElement;
+        if(messageLogsBtn) {
+          messageLogsBtn.click();
+        }
+      }, 100);
+    });
   }
 
   /**
@@ -709,6 +722,23 @@ export class AppSidebarLeft extends SidebarSlider {
       }
     };
 
+    const btnMessageLogs: typeof menuButtons[0] = {
+      icon: 'bug',
+      text: 'ReportBug',
+      onClick: () => {
+        // Open the right sidebar with message logs
+        const appSidebarRight = MOUNT_CLASS_TO.appSidebarRight;
+        appSidebarRight.toggleSidebar(true);
+        // Switch to message logs tab
+        setTimeout(() => {
+          const messageLogsBtn = appSidebarRight.sidebarEl.querySelector('.tab-nav-btn:last-child') as HTMLElement;
+          if(messageLogsBtn) {
+            messageLogsBtn.click();
+          }
+        }, 100);
+      }
+    };
+
     const onContactsClick = () => {
       closeTabsBefore(() => {
         this.createTab(AppContactsTab).open();
@@ -788,7 +818,7 @@ export class AppSidebarLeft extends SidebarSlider {
       icon: 'user',
       text: 'Contacts',
       onClick: onContactsClick
-    }, {
+    }, btnMessageLogs, {
       id: 'settings',
       icon: 'settings',
       text: 'Settings',

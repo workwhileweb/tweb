@@ -8,6 +8,7 @@ import appImManager, {APP_TABS} from '../../lib/appManagers/appImManager';
 import SidebarSlider from '../slider';
 import mediaSizes, {ScreenSize} from '../../helpers/mediaSizes';
 import AppSharedMediaTab from './tabs/sharedMedia';
+import AppMessageLogsTab from './tabs/messageLogs';
 import {MOUNT_CLASS_TO} from '../../config/debug';
 import {AppManagers} from '../../lib/appManagers/managers';
 import appNavigationController from '../appNavigationController';
@@ -18,6 +19,7 @@ export const RIGHT_COLUMN_ACTIVE_CLASSNAME = 'is-right-column-shown';
 export class AppSidebarRight extends SidebarSlider {
   private isColumnProportionSet = false;
   private sharedMediaTab: AppSharedMediaTab;
+  private messageLogsTab: AppMessageLogsTab;
   // public rect: DOMRect;
 
   constructor() {
@@ -30,6 +32,9 @@ export class AppSidebarRight extends SidebarSlider {
 
   construct(managers: AppManagers) {
     this.managers = managers;
+
+    // Create tab navigation
+    this.createTabNavigation();
 
     mediaSizes.addEventListener('changeScreen', (from, to) => {
       if(to === ScreenSize.medium && from !== ScreenSize.mobile) {
@@ -66,6 +71,55 @@ export class AppSidebarRight extends SidebarSlider {
     tab.slider = this;
     // this.tabsContainer.prepend(tab.container);
     return tab;
+  }
+
+  public createMessageLogsTab() {
+    const tab = this.createTab(AppMessageLogsTab, false, true);
+    tab.slider = this;
+    return tab;
+  }
+
+  private createTabNavigation() {
+    const navContainer = document.createElement('div');
+    navContainer.className = 'sidebar-tab-navigation';
+    
+    const sharedMediaBtn = document.createElement('button');
+    sharedMediaBtn.className = 'tab-nav-btn active';
+    sharedMediaBtn.textContent = 'Shared Media';
+    
+    const messageLogsBtn = document.createElement('button');
+    messageLogsBtn.className = 'tab-nav-btn';
+    messageLogsBtn.textContent = 'Message Logs';
+    
+    navContainer.append(sharedMediaBtn, messageLogsBtn);
+    
+    // Insert navigation before the tabs container
+    this.sidebarEl.insertBefore(navContainer, this.tabsContainer);
+    
+    // Add click handlers
+    sharedMediaBtn.addEventListener('click', () => {
+      this.switchToTab('shared-media');
+      sharedMediaBtn.classList.add('active');
+      messageLogsBtn.classList.remove('active');
+    });
+    
+    messageLogsBtn.addEventListener('click', () => {
+      this.switchToTab('message-logs');
+      messageLogsBtn.classList.add('active');
+      sharedMediaBtn.classList.remove('active');
+    });
+  }
+
+  private switchToTab(tabName: string) {
+    if(tabName === 'shared-media') {
+      if(this.sharedMediaTab) {
+        this.sharedMediaTab.open();
+      }
+    } else if(tabName === 'message-logs') {
+      if(this.messageLogsTab) {
+        this.messageLogsTab.open();
+      }
+    }
   }
 
   public replaceSharedMediaTab(tab?: AppSharedMediaTab) {
@@ -145,6 +199,13 @@ export class AppSidebarRight extends SidebarSlider {
     if(!willChange) return Promise.resolve();
 
     if(!active && !this.historyTabIds.length) {
+      // Create both tabs if they don't exist
+      if(!this.sharedMediaTab) {
+        this.sharedMediaTab = this.createSharedMediaTab();
+      }
+      if(!this.messageLogsTab) {
+        this.messageLogsTab = this.createMessageLogsTab();
+      }
       this.sharedMediaTab.open();
     }
 
