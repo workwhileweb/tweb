@@ -37,7 +37,11 @@ const processChangelog = (fileName) => {
     }
 
     const firstLine = splitted.shift();
-    const version = firstLine.split(' ')[1];
+    const version = firstLine?.replace('### ', '').split(' ')[0]?.trim();
+    if(!version) {
+      console.log('No version found in', fileName);
+      return;
+    }
     fs.writeFileSync(writeTo.replace('{VERSION}', version), splitted.join('\n') + '\n');
   });
 };

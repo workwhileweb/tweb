@@ -322,6 +322,22 @@ export default class MTPNetworker {
       this.log('MT call', method, params, messageId, seqNo);
     }
 
+    // Log MTProto calls (including file operations)
+    console.log('📁 TELEGRAM MTPROTO CALL:', JSON.stringify({
+      timestamp: new Date().toISOString(),
+      dcId: this.dcId,
+      messageId: messageId.toString(),
+      method: method,
+      params: params,
+      isFileUpload: this.isFileUpload,
+      isFileDownload: this.isFileDownload,
+      options: {
+        notContentRelated: options.notContentRelated,
+        noResponse: options.noResponse,
+        longPoll: options.longPoll
+      }
+    }, null, 2));
+
     return this.pushMessage(message, options);
   }
 
@@ -341,6 +357,20 @@ export default class MTPNetworker {
     if(Modes.debug) {
       this.log('MT message', object, messageId, seqNo);
     }
+
+    // Log MTProto messages (non-API calls)
+    console.log('📤 TELEGRAM MTPROTO MESSAGE:', JSON.stringify({
+      timestamp: new Date().toISOString(),
+      dcId: this.dcId,
+      messageId: messageId.toString(),
+      messageType: object._,
+      object: object,
+      options: {
+        notContentRelated: options.notContentRelated,
+        noResponse: options.noResponse,
+        longPoll: options.longPoll
+      }
+    }, null, 2));
 
     return this.pushMessage(message, options);
   }
@@ -411,6 +441,22 @@ export default class MTPNetworker {
     };
 
     log('call', method, message, params, options);
+
+    // Log API request as JSON
+    console.log('🔵 TELEGRAM API REQUEST:', JSON.stringify({
+      timestamp: new Date().toISOString(),
+      dcId: this.dcId,
+      messageId: messageId.toString(),
+      method: method,
+      params: params,
+      options: {
+        dcId: options.dcId,
+        afterMessageId: options.afterMessageId,
+        fileUpload: options.fileUpload,
+        fileDownload: options.fileDownload,
+        resultType: options.resultType
+      }
+    }, null, 2));
 
     return this.pushMessage(message, options);
   }
@@ -922,6 +968,20 @@ export default class MTPNetworker {
     this.status = status;
 
     if(willChange) {
+      // Log connection status change
+      console.log('🔗 TELEGRAM CONNECTION STATUS:', JSON.stringify({
+        timestamp: new Date().toISOString(),
+        dcId: this.dcId,
+        name: this.name,
+        oldStatus: this.status,
+        newStatus: status,
+        isOnline: isOnline,
+        isFileNetworker: this.isFileNetworker,
+        isFileDownload: this.isFileDownload,
+        isFileUpload: this.isFileUpload,
+        retryAt: retryAt
+      }, null, 2));
+
       if(this.networkerFactory.onConnectionStatusChange) {
         this.networkerFactory.onConnectionStatusChange({
           _: 'networkerStatus',
@@ -1797,6 +1857,16 @@ export default class MTPNetworker {
       case 'bad_server_salt': {
         log('bad server salt', message);
 
+        // Log bad server salt event
+        console.log('⚠️ TELEGRAM BAD SERVER SALT:', JSON.stringify({
+          timestamp: new Date().toISOString(),
+          dcId: this.dcId,
+          messageId: messageId.toString(),
+          badMsgId: message.bad_msg_id.toString(),
+          newServerSalt: bytesToHex(message.new_server_salt),
+          errorCode: message.error_code
+        }, null, 2));
+
         this.applyServerSalt(message.new_server_salt);
 
         if(this.sentMessages[message.bad_msg_id]) {
@@ -1882,6 +1952,16 @@ export default class MTPNetworker {
         log.debug('new_session_created', message);
         // this.updateSession();
 
+        // Log new session creation
+        console.log('🔄 TELEGRAM SESSION CREATED:', JSON.stringify({
+          timestamp: new Date().toISOString(),
+          dcId: this.dcId,
+          messageId: messageId.toString(),
+          firstMsgId: message.first_msg_id.toString(),
+          serverSalt: bytesToHex(message.server_salt),
+          uniqueId: message.unique_id.toString()
+        }, null, 2));
+
         this.processMessageAck(message.first_msg_id);
         this.applyServerSalt(message.server_salt);
 
@@ -1966,9 +2046,35 @@ export default class MTPNetworker {
           if(result._ === 'rpc_error') {
             const error = this.processError(result);
             log('rpc error', result, sentMessage, error);
+            
+            // Log API error response as JSON
+            console.log('🔴 TELEGRAM API ERROR:', JSON.stringify({
+              timestamp: new Date().toISOString(),
+              dcId: this.dcId,
+              requestMessageId: sentMessageId.toString(),
+              responseMessageId: messageId.toString(),
+              method: sentMessage.humanReadable,
+              error: {
+                type: result.error_message,
+                code: result.error_code,
+                details: error
+              }
+            }, null, 2));
+            
             deferred?.reject(error);
           } else {
             log('rpc result', result, sentMessage/* , Date.now() - sentMessage.sentTime, sentMessage.sentTime */);
+            
+            // Log API success response as JSON
+            console.log('🟢 TELEGRAM API RESPONSE:', JSON.stringify({
+              timestamp: new Date().toISOString(),
+              dcId: this.dcId,
+              requestMessageId: sentMessageId.toString(),
+              responseMessageId: messageId.toString(),
+              method: sentMessage.humanReadable,
+              result: result
+            }, null, 2));
+            
             deferred?.resolve(result);
 
             if(sentMessage.isAPI && !this.connectionInited) {
@@ -2016,6 +2122,15 @@ export default class MTPNetworker {
         /* if(this.debug) {
           this.log.debug('Update', message);
         } */
+
+        // Log other message types (updates, service messages, etc.)
+        console.log('🟡 TELEGRAM MESSAGE:', JSON.stringify({
+          timestamp: new Date().toISOString(),
+          dcId: this.dcId,
+          messageId: messageId.toString(),
+          messageType: message._,
+          message: message
+        }, null, 2));
 
         if(this.networkerFactory.updatesProcessor !== null) {
           this.networkerFactory.updatesProcessor(message);
