@@ -1,0 +1,1 @@
+D:\telegramWebK\src\lib\mtproto\networker.ts
