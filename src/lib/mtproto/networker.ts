@@ -2046,7 +2046,7 @@ export default class MTPNetworker {
           if(result._ === 'rpc_error') {
             const error = this.processError(result);
             log('rpc error', result, sentMessage, error);
-            
+
             // Log API error response as JSON
             console.log('🔴 TELEGRAM API ERROR:', JSON.stringify({
               timestamp: new Date().toISOString(),
@@ -2060,11 +2060,11 @@ export default class MTPNetworker {
                 details: error
               }
             }, null, 2));
-            
+
             deferred?.reject(error);
           } else {
             log('rpc result', result, sentMessage/* , Date.now() - sentMessage.sentTime, sentMessage.sentTime */);
-            
+
             // Log API success response as JSON
             console.log('🟢 TELEGRAM API RESPONSE:', JSON.stringify({
               timestamp: new Date().toISOString(),
@@ -2074,7 +2074,7 @@ export default class MTPNetworker {
               method: sentMessage.humanReadable,
               result: result
             }, null, 2));
-            
+
             deferred?.resolve(result);
 
             if(sentMessage.isAPI && !this.connectionInited) {

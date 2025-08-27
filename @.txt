@@ -1,1 +1,6 @@
 D:\telegramWebK\src\lib\mtproto\networker.ts
+
+git config core.autocrlf false
+git rm --cached -r .
+git reset --hard
+File > Preferences > Settings > Files:Eol

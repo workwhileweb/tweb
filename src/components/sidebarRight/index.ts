@@ -82,27 +82,27 @@ export class AppSidebarRight extends SidebarSlider {
   private createTabNavigation() {
     const navContainer = document.createElement('div');
     navContainer.className = 'sidebar-tab-navigation';
-    
+
     const sharedMediaBtn = document.createElement('button');
     sharedMediaBtn.className = 'tab-nav-btn active';
     sharedMediaBtn.textContent = 'Shared Media';
-    
+
     const messageLogsBtn = document.createElement('button');
     messageLogsBtn.className = 'tab-nav-btn';
     messageLogsBtn.textContent = 'Message Logs';
-    
+
     navContainer.append(sharedMediaBtn, messageLogsBtn);
-    
+
     // Insert navigation before the tabs container
     this.sidebarEl.insertBefore(navContainer, this.tabsContainer);
-    
+
     // Add click handlers
     sharedMediaBtn.addEventListener('click', () => {
       this.switchToTab('shared-media');
       sharedMediaBtn.classList.add('active');
       messageLogsBtn.classList.remove('active');
     });
-    
+
     messageLogsBtn.addEventListener('click', () => {
       this.switchToTab('message-logs');
       messageLogsBtn.classList.add('active');
