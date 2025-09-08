@@ -1,3 +1,5 @@
+.chrome-profile
+
 node_modules
 coverage
 __pycache__

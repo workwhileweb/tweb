@@ -45,7 +45,7 @@ import {ActiveAccountNumber} from '../accounts/types';
 import AccountController from '../accounts/accountController';
 import makeError from '../../helpers/makeError';
 
-// console.error('networker included!', new Error().stack);
+console.error('networker included!', new Error().stack);
 
 export type MTMessageOptions = InvokeApiOptions & Partial<{
   noResponse: boolean, // http_wait

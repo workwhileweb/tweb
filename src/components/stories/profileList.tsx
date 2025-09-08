@@ -122,7 +122,7 @@ function _StoriesProfileList(props: {
           onlyStripped: true
         });
         const thumb = gotThumb.image;
-        element.parentElement.prepend(thumb);
+        element.parentElement?.prepend(thumb);
 
         onCleanup(() => {
           thumb.remove();
@@ -131,7 +131,7 @@ function _StoriesProfileList(props: {
 
       if(element.parentElement && props.pinned && (storyItem as StoryItem.storyItem).pinnedIndex !== undefined) {
         icon ??= Icon('pin2', 'grid-item-pin');
-        element.parentElement.append(icon);
+        element.parentElement?.append(icon);
       } else if(icon) {
         icon.remove();
       }

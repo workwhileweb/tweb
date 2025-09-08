@@ -265,6 +265,8 @@ class ApiManagerProxy extends MTProtoMessagePort {
         if(!commonEventNames.has(name as keyof BroadcastEvents) && isDifferentAccount) return;
         // @ts-ignore
         rootScope.dispatchEventSingle(name, ...args);
+
+        console.warn('event', name, args);
       },
 
       localStorageProxy: (payload) => {

@@ -625,6 +625,8 @@ export default class ChatBubbles {
     this.listenerSetter.add(rootScope)('message_sent', (e) => {
       const {storageKey, tempId, tempMessage, mid, message} = e;
 
+      console.warn('message_sent', e);
+
       // ! can't use peerId to validate here, because id can be the same in 'scheduled' and 'chat' types
       if(this.chat.messagesStorageKey !== storageKey) {
         return;
@@ -808,6 +810,8 @@ export default class ChatBubbles {
 
     this.listenerSetter.add(rootScope)('message_edit', async({storageKey, message}) => {
       if(storageKey !== this.chat.messagesStorageKey) return;
+
+      console.warn('message_edit', message);
 
       const fullMid = makeFullMid(message);
       const bubble = this.getBubble(fullMid);

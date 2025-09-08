@@ -172,7 +172,12 @@ export default function wrapKeyboardButton({
 
     case 'keyboardButtonCallback': {
       buttonEl = document.createElement('button');
+
+      console.warn('keyboardButtonCallback', peerId, messageMid, button);
+
       onClick = () => {
+        console.warn('keyboardButtonCallback onClick', peerId, messageMid, button);
+
         rootScope.managers.appInlineBotsManager.callbackButtonClick(peerId, messageMid, button)
         .then((callbackAnswer) => {
           if(typeof callbackAnswer.message === 'string' && callbackAnswer.message.length) {
